@@ -36,9 +36,11 @@ object main
         return col_elements //TODO sort return of the list
     }
 
-    def is_sequential_col(grid : Array[Array[Int]], col: Int) : Boolean =
+    def is_sequential_col(grid : Array[Array[Int]], row: Int, col: Int) : Boolean =
     {
         val size = grid.size
+        if (row != (size-1)) return true
+
         val col_elements = get_col_elements(grid, col)
         for(index <- 0 to (size-2))
         {
@@ -52,10 +54,12 @@ object main
         return true
     }
 
-    def is_sequential_row(grid : Array[Array[Int]], row: Int) : Boolean =
+    def is_sequential_row(grid : Array[Array[Int]], row: Int, col: Int) : Boolean =
     {
         val size = grid.size
         val row_elements = get_row_elements(grid, row)
+
+        if (col != (size-1)) return true
 
         for(index <- 0 to (size-2))
         {
@@ -63,7 +67,6 @@ object main
             val next_row_element = if (row_elements(index+1) >= 10) (row_elements(index+1)/10) else row_elements(index+1)
 
             val op = (current_row_element - next_row_element).abs
-            println(op)
             if(((current_row_element-next_row_element).abs) > 1) return false
 
             if(row_elements(index+1) == -1) return true
@@ -73,7 +76,7 @@ object main
     }
 
     def is_sequential_row_and_col(grid : Array[Array[Int]], row: Int, col: Int) : Boolean =
-        is_sequential_row(grid, row) && is_sequential_col(grid, col)
+        is_sequential_row(grid, row, col) && is_sequential_col(grid, row, col)
 
     def has_number_in_row(grid : Array[Array[Int]], row: Int, number: Int) : Boolean =
     {
@@ -94,22 +97,16 @@ object main
                !has_number_in_row(grid, row, number) &&
                !has_number_in_col(grid, col, number) &&
                !is_static(grid, row, col) &&
-               !is_sequential_row_and_col(grid, row, col)
+               is_sequential_row_and_col(grid, row, col)
     }
 
     def all_numbers_have_been_tested(grid: Array[Array[Array[Int]]]) : Boolean = 
     {
         val size = grid.size
-
-        for(row <- 0 to (size-1))
+        
+        for(number <- 0 to (size-1))
         {
-            for(col <- 0 to (size-1))
-            {
-                for(number <- 0 to (size-1))
-                {
-                    if(grid(row)(col)(number) != -1) return false
-                }
-            }
+            if(grid(0)(0)(number) != -1) return false
         }
         
         return true
@@ -123,10 +120,43 @@ object main
 
         for(t <- 0 to (size-1))
         {
-            if (not_tested(t) != -1) return not_tested(t)
+            if (not_tested(t) != -1)
+            {
+                val number = not_tested(t)
+                not_tested(t) = -1
+                return number
+            }
         }
 
         return -1
+    }
+
+    def update_tested_numbers(tested_numbers: Array[Array[Array[Int]]], r: Int, c : Int) : Array[Array[Array[Int]]] = 
+    {
+        val size = tested_numbers.size
+        val updated_tested_numbers = tested_numbers
+        for(row <- r to (size-1))
+        {
+            for(col <- c to (size-1))
+            {
+                for(number <- 0 to (size-1))
+                {
+                    updated_tested_numbers(row)(col)(number) = number+1
+                }
+            }
+        }
+
+        return updated_tested_numbers
+    }
+
+    def finished_all_cell_possibilities(grid: Array[Array[Int]], r: Int, c : Int, tested_numbers: Array[Array[Array[Int]]]) : Boolean =
+    {
+        val row = r
+        val col = c
+
+        val updated_tested_numbers = update_tested_numbers(tested_numbers, row, col)
+
+        return solve(grid, row, (col-1), updated_tested_numbers)
     }
 
     def solve (grid: Array[Array[Int]], r: Int, c : Int, tested_numbers: Array[Array[Array[Int]]]) : Boolean =
@@ -135,22 +165,25 @@ object main
 
             var row = r
             var col = c
-
-            if(row == size-1 && col == size) return true
-
+           
             if( ( (row == -1) || all_numbers_have_been_tested(tested_numbers) )) return false // se chegou em linha -1 ou todos os números foram testados, retorna falso
 
-            if(row == size && col == 0) return true
+            if(row == size && col == 0) return true // working
 
-            if(col == -1) return solve(grid, (row-1), (col-1), tested_numbers)
+            if(col == size) return solve(grid, (row+1), 0, tested_numbers)
 
+            if(col == -1) return solve(grid, (row-1), (size-1), tested_numbers)
 
             if(is_static(grid, row, col) || cell_has_been_assigned(grid, row, col)) 
+            {
                 return solve(grid, row, (col+1), tested_numbers)
+            }
+            
+            val number = get_not_tested_number(tested_numbers, row, col)
+
+            if (number == -1) return finished_all_cell_possibilities(grid, row, col, tested_numbers)
 
             val previous_number = grid(row)(col)
-            val number          = get_not_tested_number(tested_numbers, row, col)
-
             if(can_assign_number(grid, row, col, number))
             {
                 grid(row)(col) = number
@@ -158,9 +191,8 @@ object main
                 return solve(grid, row, (col+1), tested_numbers)
             }
 
-            // not_tested(row, col)
             grid(row)(col) = previous_number
-            return solve(grid, row, col, tested_numbers)
+            return solve(grid, row, col-1, tested_numbers)
     }
     
     def create_grid(size : Int) : Array[Array[Int]] =
@@ -173,13 +205,13 @@ object main
         grid(0)(3) = -1
         grid(1)(0) = -1
         grid(1)(1) = 0
-        grid(1)(2) = 1
+        grid(1)(2) = 10
         grid(1)(3) = 0
         grid(2)(0) = -1
         grid(2)(1) = 0
-        grid(2)(2) = 1
+        grid(2)(2) = 10
         grid(2)(3) = 0
-        grid(3)(0) = 1
+        grid(3)(0) = -1
         grid(3)(1) = -1
         grid(3)(2) = 0
         grid(3)(3) = 0
@@ -191,12 +223,14 @@ object main
         val size : Int = 4
         var grid = create_grid(size)
         val ts   = create_not_tested_grid(size)
+        ts(0)(0)(0) = 5
+        val t = update_tested_numbers(ts, 0, 0)
 
         val row : Int = 0
         val col : Int = 0
         val number : Int = 1
         if(solve(grid, row, col, ts)) //default row=0 col=0 number=1
-            println("yay")
+            print_grid(grid)
         else
             println("could not solve :(")
     }
@@ -211,12 +245,45 @@ object main
             {
                 for(n <- 0 to (size-1))
                 {
-                    grid(row)(col)(n) = n
+                    grid(row)(col)(n) = (n+1)
                 }
             }
         }
-        val n = grid(2)(1)
         return grid
+    }
+
+    def print_not_tested(grid: Array[Array[Array[Int]]]) : Boolean =
+    {
+        val size = grid.size
+        for(row <- 0 to (size-1))
+        {
+            for(col <- 0 to (size-1))
+            {
+                for(n <- 0 to (size-1))
+                {
+                    println(grid(row)(col)(n))
+                }
+            }
+        }
+
+        return false
+    }
+
+    def print_grid(grid : Array[Array[Int]]) : Boolean =
+    {
+        val size = grid.size
+        for(row <- 0 to (size-1))
+        {
+            var row_str = "["
+            for(col <- 0 to (size-1))
+            {
+                var t = grid(row)(col)
+                row_str = row_str+t.toString
+            }
+            println(row_str+"]\n")
+        }
+
+        return false
     }
 
 }
