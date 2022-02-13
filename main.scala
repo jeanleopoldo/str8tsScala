@@ -1,6 +1,5 @@
 import scala.collection.mutable.ListBuffer
 
-
 object main
 {
     def is_static(grid: Array[Array[Int]], row: Int, col: Int) : Boolean = grid(row)(col) == -1
@@ -120,15 +119,15 @@ object main
 
         for(t <- 0 to (size-1))
         {
-            if (not_tested(t) != -1)
+            if (not_tested(t) != -2)
             {
                 val number = not_tested(t)
-                not_tested(t) = -1
+                not_tested(t) = -2
                 return number
             }
         }
 
-        return -1
+        return -2
     }
 
     def update_tested_numbers(tested_numbers: Array[Array[Array[Int]]], r: Int, c : Int) : Array[Array[Array[Int]]] = 
@@ -151,11 +150,16 @@ object main
 
     def finished_all_cell_possibilities(grid: Array[Array[Int]], r: Int, c : Int, tested_numbers: Array[Array[Array[Int]]]) : Boolean =
     {
+        val size = grid.size
         val row = r
         val col = c
 
-        val updated_tested_numbers = update_tested_numbers(tested_numbers, row, col)
+        if(col == -1) return finished_all_cell_possibilities(grid, (row-1), (size-1), tested_numbers)
 
+        if(row == -1) return false
+
+        val updated_tested_numbers = update_tested_numbers(tested_numbers, row, col)
+        println("updated_tested_numbers")  
         return solve(grid, row, (col-1), updated_tested_numbers)
     }
 
@@ -166,28 +170,48 @@ object main
             var row = r
             var col = c
            
-            if( ( (row == -1) || all_numbers_have_been_tested(tested_numbers) )) return false // se chegou em linha -1 ou todos os números foram testados, retorna falso
+            if( ( (row == -1) || all_numbers_have_been_tested(tested_numbers) ))
+            {
+                println("first if")
+                return false // se chegou em linha -1 ou todos os números foram testados, retorna falso
+            }
 
-            if(row == size && col == 0) return true // working
+            if(row == size && col == 0)
+            {
+                println("second if")
+                return true // working
+            }
+            
 
-            if(col == size) return solve(grid, (row+1), 0, tested_numbers)
+            if(col == size)
+            {
+                println("third if")
+                return solve(grid, (row+1), 0, tested_numbers)
+            }
 
-            if(col == -1) return solve(grid, (row-1), (size-1), tested_numbers)
+            if(col == -1)
+            {
+                println("fourth if")
+                return solve(grid, (row-1), (size-1), tested_numbers)
+            }
 
             if(is_static(grid, row, col) || cell_has_been_assigned(grid, row, col)) 
             {
+                println("fifth if")
                 return solve(grid, row, (col+1), tested_numbers)
             }
             
             val number = get_not_tested_number(tested_numbers, row, col)
-
-            if (number == -1) return finished_all_cell_possibilities(grid, row, col, tested_numbers)
+            println(number)
+            if (number == -2) return finished_all_cell_possibilities(grid, row, col, tested_numbers)
 
             val previous_number = grid(row)(col)
+
+            
+            tested_numbers(row)(col)(number) = -2
             if(can_assign_number(grid, row, col, number))
             {
                 grid(row)(col) = number
-                tested_numbers(row)(col)(number) = -1
                 return solve(grid, row, (col+1), tested_numbers)
             }
 
@@ -195,6 +219,24 @@ object main
             return solve(grid, row, col-1, tested_numbers)
     }
     
+    
+    def main(args: Array[String]) : Unit =
+    {
+        val size : Int = 4
+        var grid = create_grid(size)
+        val ts   = create_not_tested_grid(size)
+        ts(0)(0)(0) = 5
+        val t = update_tested_numbers(ts, 0, 0)
+
+        val row : Int = 0
+        val col : Int = 0
+        val number : Int = 1
+        if(solve(grid, row, col, ts)) //default row=0 col=0 number=1
+            print_grid(grid)
+        else
+            println("could not solve :(")
+    }
+
     def create_grid(size : Int) : Array[Array[Int]] =
     {
         val grid = Array.ofDim[Int](size, size)
@@ -217,22 +259,6 @@ object main
         grid(3)(3) = 0
 
         return grid
-    }
-    def main(args: Array[String]) : Unit =
-    {
-        val size : Int = 4
-        var grid = create_grid(size)
-        val ts   = create_not_tested_grid(size)
-        ts(0)(0)(0) = 5
-        val t = update_tested_numbers(ts, 0, 0)
-
-        val row : Int = 0
-        val col : Int = 0
-        val number : Int = 1
-        if(solve(grid, row, col, ts)) //default row=0 col=0 number=1
-            print_grid(grid)
-        else
-            println("could not solve :(")
     }
     
     def create_not_tested_grid(size : Int) : Array[Array[Array[Int]]] =
