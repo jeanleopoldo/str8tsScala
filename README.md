@@ -1,8 +1,8 @@
 # str8tsScala
 
 ## Requirements
-- [scala 2.13.6] (https://www.scala-lang.org/download/2.13.6.html)
-- [Java JDK 8] (http://www.oracle.com/technetwork/pt/java/javase/downloads/jdk8-downloads-2133151.html)
+- [scala 2.13.6](https://www.scala-lang.org/download/2.13.6.html)
+- [Java JDK 8](http://www.oracle.com/technetwork/pt/java/javase/downloads/jdk8-downloads-2133151.html)
 
 ## How to run
 - There is a script to run. In the project root's folder, run ./scripts/run.sh
