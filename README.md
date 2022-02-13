@@ -1,5 +1,8 @@
 # str8tsScala
 
+This is an attempt to solve the game str8ts(https://www.janko.at/Raetsel/Straights/index.htm). It uses the backtracking technique to solve the afore mentioned game. As it uses brute force, it is a very demanding algorithm and not best optimized.
+__Time Complexity:__ O(n³)
+
 ## Requirements
 - [scala 2.13.6](https://www.scala-lang.org/download/2.13.6.html)
 - [Java JDK 8](http://www.oracle.com/technetwork/pt/java/javase/downloads/jdk8-downloads-2133151.html)
