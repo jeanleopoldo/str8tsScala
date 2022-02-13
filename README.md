@@ -1,6 +1,6 @@
 # str8tsScala
 
-This is an attempt to solve the game str8ts(https://www.janko.at/Raetsel/Straights/index.htm). It uses the backtracking technique to solve the afore mentioned game. As it uses brute force, it is a very demanding algorithm and not best optimized.
+This is an attempt to solve the game [str8ts](https://www.janko.at/Raetsel/Straights/index.htm). It uses the backtracking technique to solve the afore mentioned game. As it uses brute force, it is a very demanding algorithm and not best optimized.
 __Time Complexity:__ O(n³)
 
 ## Requirements
