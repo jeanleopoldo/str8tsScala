@@ -114,7 +114,6 @@ object main
     def get_not_tested_number(grid: Array[Array[Array[Int]]], row : Int, col : Int) : Int =
     {
         val size = grid.size
-
         var not_tested = grid(row)(col)
 
         for(t <- 0 to (size-1))
@@ -130,22 +129,15 @@ object main
         return -2
     }
 
-    def update_tested_numbers(tested_numbers: Array[Array[Array[Int]]], r: Int, c : Int) : Array[Array[Array[Int]]] = 
+    def update_tested_numbers(tested_numbers: Array[Array[Array[Int]]], row: Int, col : Int) : Array[Array[Array[Int]]] = 
     {
         val size = tested_numbers.size
-        val updated_tested_numbers = tested_numbers
-        for(row <- r to (size-1))
+        for(number <- 0 to (size-1))
         {
-            for(col <- c to (size-1))
-            {
-                for(number <- 0 to (size-1))
-                {
-                    updated_tested_numbers(row)(col)(number) = number+1
-                }
-            }
+            tested_numbers(row)(col)(number) = number+1
         }
 
-        return updated_tested_numbers
+        return tested_numbers
     }
 
     def finished_all_cell_possibilities(grid: Array[Array[Int]], r: Int, c : Int, tested_numbers: Array[Array[Array[Int]]]) : Boolean =
@@ -158,9 +150,8 @@ object main
 
         if(row == -1) return false
 
-        val updated_tested_numbers = update_tested_numbers(tested_numbers, row, col)
-        println("updated_tested_numbers")  
-        return solve(grid, row, (col-1), updated_tested_numbers)
+        update_tested_numbers(tested_numbers, row, col)
+        return solve(grid, row, (col-1), tested_numbers)
     }
 
     def solve (grid: Array[Array[Int]], r: Int, c : Int, tested_numbers: Array[Array[Array[Int]]]) : Boolean =
@@ -169,7 +160,6 @@ object main
 
             var row = r
             var col = c
-           
             if( ( (row == -1) || all_numbers_have_been_tested(tested_numbers) ))
             {
                 println("first if")
@@ -251,7 +241,7 @@ object main
         grid(1)(3) = 0
         grid(2)(0) = -1
         grid(2)(1) = 0
-        grid(2)(2) = 10
+        grid(2)(2) = 20
         grid(2)(3) = 0
         grid(3)(0) = -1
         grid(3)(1) = -1
