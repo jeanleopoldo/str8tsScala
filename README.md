@@ -17,7 +17,7 @@ On the main method are the size one must create a table. There is no verificatio
 
 - The static cells are represented by -1
 - The empty cells are represented by 0
-- The cell already field by the game must be multiplied by 10 and must in the range of 1 to table's size
+- The cell already filled by the game must be multiplied by 10 and must in the range of 1 to table's size
 
 ## Output
 Result as long as it was solved will be printed on the terminal
